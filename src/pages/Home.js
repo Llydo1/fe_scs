@@ -7,9 +7,10 @@ import BonusCoupons from "../components/home_components/BonusCoupons";
 
 const Home = () => {
     return (
-        <div>
+        <div classname="box-border ">
             <HeroBanner />
-            <WarningBanner />
+            <div></div>
+            <WarningBanner classname="mt-7" />
             <LightningDeals />
             <ClearanceDeals />
             <BonusCoupons />
