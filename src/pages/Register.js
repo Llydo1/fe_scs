@@ -2,30 +2,54 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import backgroundImage from '../assest/background.png';
-import registerIcons from '../assest/signin.gif'
+import registerIcons from '../assest/signin.gif';
+import imageTobase64 from '../helpers/imageTobase64'
 
 const Register = () => {
-  const [email, setEmail] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [data, setData] = useState({
+    email: '',
+    phone: '',
+    fullName: '',
+    password: '',
+    confirmPassword: '',
+    profilePic: '',
+  });
+
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConFirmPassword] = useState(false);
+
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('FullName:', fullName);
-    console.log('Phone:', phone);
-    console.log('Confirm Password:', confirmPassword);
-    // Add registration logic here
+    console.log('Form submitted:', data);
+    // Add form submission logic here
   };
 
+  const handleUploadPic = async(e) => {
+    const file = e.target.files[0]
+    const imagePic = await imageTobase64(file)
+
+    setData((preve) => {
+      return{
+        ...preve,
+        profilePic: imagePic
+      }
+    })
+    
+  }
   const handleBack = () => {
-    navigate('/');  
+    navigate('/');
   };
+
+  console.log('data login', data);
 
   return (
     <div
@@ -37,120 +61,113 @@ const Register = () => {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <div className="relative bg-white p-8 rounded-lg shadow-lg w-96 z-10">
+      <div className="relative bg-white p-8 rounded-lg m-5 shadow-lg w-96 z-10">
         {/* Back Icon */}
         <FaArrowLeft
           className="absolute top-4 left-4 text-xl text-gray-500 cursor-pointer hover:text-black"
           onClick={handleBack}
         />
 
-        <div className='w-20 h-20 mx-auto'>
-          <img src={registerIcons} alt='register Icons' 
-          className='w-full h-full mix-blend-multiply'/>
+        <div className="w-20 h-20 mx-auto relative overflow-hidden rounded-full">
+          <div>
+            <img src={data.profilePic ||registerIcons} alt="register Icons" className="w-full h-full mix-blend-multiply" />
+          </div>
+          <form>
+            <label>
+              <div className='text-xs bg-opacity-80 bg-slate-200 pb-3 cursor-pointer text-center absolute bottom-0 w-full'>
+                Tải ảnh
+              </div>
+              <input type='file' className='hidden' onChange={handleUploadPic} />
+            </label>
+          </form>
+
         </div>
 
-        <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
-        <form onSubmit={handleSubmit}>
+        <h2 className="text-2xl font-bold mb-4 text-center">Đăng ký</h2>
+        <form onSubmit={handleSubmit} className="pt-6 flex flex-col gap-2">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email" 
+              value={data.email} 
+              onChange={handleOnChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700">Họ & tên</label>
             <input
-              type="fullName"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              type="text" 
+              name="fullName" 
+              value={data.fullName} 
+              onChange={handleOnChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
             <input
-              type="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              type="tel" 
+              name="phone" 
+              value={data.phone} 
+              onChange={handleOnChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               required
             />
           </div>
           <div className="mb-4 relative">
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            
-            <div className='flex items-center'>
+            <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
+            <div className="flex items-center">
               <input
                 type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm pr-10" 
+                name="password" 
+                value={data.password} 
+                onChange={handleOnChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm pr-10"
                 required
               />
-              <div className='absolute right-3 text-xl cursor-pointer'
-                onClick={() => setShowPassword((preve) => !preve )}
+              <div
+                className="absolute right-3 text-xl cursor-pointer"
+                onClick={() => setShowPassword((prev) => !prev)}
               >
-              <span>
-                  {
-                    showPassword ? (
-                      <FaEyeSlash />
-                    )
-                    :
-                    (
-                      <FaEye />
-                    )
-                  }
-                </span>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </div>
             </div>
           </div>
           <div className="mb-4 relative">
-            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <div className='flex items-center'>
+            <label className="block text-sm font-medium text-gray-700">Xác nhận mật khẩu</label>
+            <div className="flex items-center">
               <input
-                type={showPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword" 
+                value={data.confirmPassword} 
+                onChange={handleOnChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm pr-10"
                 required
               />
-              <div className='absolute right-3 text-xl cursor-pointer'
-                onClick={() => setShowPassword((preve) => !preve )}
+              <div
+                className="absolute right-3 text-xl cursor-pointer"
+                onClick={() => setShowConFirmPassword((prev) => !prev)}
               >
-              <span>
-                  {
-                    showPassword ? (
-                      <FaEyeSlash />
-                    )
-                    :
-                    (
-                      <FaEye />
-                    )
-                  }
-                </span>
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </div>
             </div>
           </div>
           <button
             type="submit"
-            className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600 mb-4"
+            className="w-full bg-orange-400 text-white py-2 rounded-md hover:bg-orange-600 mb-4"
           >
-            Register
+            Đăng ký
           </button>
         </form>
         <div className="text-center mt-4">
           <p className="text-sm text-gray-700">
-            Already have an account?{' '}
-            <a
-              href="/login"
-              className="text-orange-500 hover:underline"
-            >
-              Login here
+            Bạn đã có tài khoản?{' '}
+            <a href="/login" className="text-orange-500 hover:underline">
+              Đăng nhập ngay!
             </a>
           </p>
         </div>
